@@ -10,11 +10,6 @@ app.config['SECRET_KEY'] = 'your-secret-key-here'
 CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-
-@app.route('/')
-def home():
-    return render_template('dc.html')
-
 # Veritabanı yerine geçici depolama
 active_connections = {}
 active_users = {}
