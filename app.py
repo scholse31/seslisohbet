@@ -43,9 +43,11 @@ class Connection:
         if len(self.messages) > 100:  # Mesaj geçmişini sınırla
             self.messages = self.messages[-50:]
 
+from flask import render_template
+
 @app.route('/')
 def home():
-    return jsonify({"message": "Sohbet Backend API", "status": "running"})
+    return render_template('dc.html')
 
 @app.route('/api/create_room', methods=['POST'])
 def create_room():
@@ -296,3 +298,4 @@ def handle_ice_candidate(data):
 if __name__ == '__main__':
 
     socketio.run(app, debug=True, host='0.0.0.0', port=5000)
+
