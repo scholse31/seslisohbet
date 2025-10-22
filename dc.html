@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerçek Zamanlı Sohbet & Sesli Görüşme</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        /* Login Screen */
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        .login-title {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .login-subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-input:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            font-weight: 600;
+            width: 100%;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        
+        /* App Container */
+        .app-container {
+            width: 100%;
+            max-width: 1200px;
+            height: 90vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: flex;
+            overflow: hidden;
+            display: none;
+        }
+        
+        /* Connection Panel */
+        .connection-panel {
+            width: 350px;
+            background: #2c3e50;
+            color: white;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #34495e;
+        }
+        
+        .panel-title {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.5rem;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: #34495e;
+            border-radius: 10px;
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #3498db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-right: 15px;
+        }
+        
+        .connection-section {
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            font-size: 1rem;
+            margin-bottom: 15px;
+            color: #ecf0f1;
+        }
+        
+        .code-inputs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .code-input {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: 1.5rem;
+            border: 2px solid #34495e;
+            border-radius: 10px;
+            background: #34495e;
+            color: white;
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        .code-input:focus {
+            border-color: #3498db;
+            background: #2c3e50;
+        }
+        
+        .connection-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .btn-success {
+            background: #2ecc71;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #27ae60;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        .connection-status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .status-connected {
+            background: rgba(46, 204, 113, 0.2);
+            border: 1px solid #2ecc71;
+            color: #2ecc71;
+        }
+        
+        .status-waiting {
+            background: rgba(241, 196, 15, 0.2);
+            border: 1px solid #f1c40f;
+            color: #f1c40f;
+        }
+        
+        .status-disconnected {
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid #e74c3c;
+            color: #e74c3c;
+        }
+        
+        /* Users List */
+        .users-section {
+            margin-top: 20px;
+        }
+        
+        .users-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .user-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: #34495e;
+            border-radius: 8px;
+        }
+        
+        .user-avatar-small {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #e74c3c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            margin-right: 10px;
+        }
+        
+        /* Chat Area */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-header {
+            padding: 20px;
+            background: #ecf0f1;
+            border-bottom: 1px solid #bdc3c7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chat-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .chat-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            background: #3498db;
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .action-btn:hover {
+            background: #2980b9;
+        }
+        
+        .action-btn.voice-call {
+            background: #2ecc71;
+        }
+        
+        .action-btn.voice-call:hover {
+            background: #27ae60;
+        }
+        
+        .action-btn.voice-call.active {
+            background: #e74c3c;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .message.sent {
+            align-items: flex-end;
+        }
+        
+        .message.received {
+            align-items: flex-start;
+        }
+        
+        .message-bubble {
+            max-width: 70%;
+            padding: 12px 18px;
+            border-radius: 18px;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sent .message-bubble {
+            background: #3498db;
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .received .message-bubble {
+            background: #e9ecef;
+            color: #333;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .message-sender {
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .message-time {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-top: 5px;
+            text-align: right;
+        }
+        
+        .system-message {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+            margin: 10px 0;
+            font-size: 0.9rem;
+        }
+        
+        .chat-input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            outline: none;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .chat-input:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        .send-button {
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            margin-left: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        
+        .send-button:hover {
+            background: #2980b9;
+            transform: scale(1.05);
+        }
+        
+        .send-button:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Voice Call Modal */
+        .voice-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        
+        .voice-modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .voice-call-container {
+            background: white;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .call-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .call-participants {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .participant {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .participant-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #3498db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 10px;
+        }
+        
+        .participant-name {
+            font-size: 0.9rem;
+        }
+        
+        .participant-status {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+        }
+        
+        .call-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .call-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s;
+        }
+        
+        .call-btn.accept {
+            background: #2ecc71;
+            color: white;
+        }
+        
+        .call-btn.decline {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .call-btn.mute {
+            background: #f39c12;
+            color: white;
+        }
+        
+        /* Waiting Screen */
+        .waiting-screen {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .waiting-icon {
+            font-size: 4rem;
+            color: #3498db;
+            margin-bottom: 20px;
+        }
+        
+        .waiting-title {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .waiting-subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+        
+        .waiting-code {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #3498db;
+            margin: 20px 0;
+            letter-spacing: 10px;
+        }
+        
+        .connected-users {
+            margin-top: 30px;
+        }
+        
+        .connected-users-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        /* Instructions */
+        .instructions {
+            margin-top: 20px;
+            padding: 15px;
+            background: #34495e;
+            border-radius: 10px;
+            font-size: 0.85rem;
+        }
+        
+        .instructions h3 {
+            margin-bottom: 10px;
+            color: #3498db;
+        }
+        
+        .instructions ol {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+                height: 95vh;
+            }
+            
+            .connection-panel {
+                width: 100%;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid #34495e;
+            }
+            
+            .chat-area {
+                height: 60%;
+            }
+            
+            .message-bubble {
+                max-width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-container" id="login-container">
+        <h1 class="login-title">Sohbet Odası</h1>
+        <p class="login-subtitle">İsminizi girip sohbete başlayın</p>
+        
+        <div class="form-group">
+            <label class="form-label" for="username">Kullanıcı Adı</label>
+            <input type="text" class="form-input" id="username" placeholder="İsminizi girin" maxlength="15">
+        </div>
+        
+        <button class="btn btn-primary" id="login-btn">Sohbete Katıl</button>
+    </div>
+    
+    <!-- Main App -->
+    <div class="app-container" id="app-container">
+        <!-- Connection Panel -->
+        <div class="connection-panel">
+            <h2 class="panel-title">Arkadaşınla Bağlan</h2>
+            
+            <div class="user-info">
+                <div class="user-avatar" id="user-avatar">S</div>
+                <div>
+                    <div class="user-name" id="user-name">Sen</div>
+                    <div class="user-status">Çevrimiçi</div>
+                </div>
+            </div>
+            
+            <div class="connection-section">
+                <h3 class="section-title">Bağlantı Kodunu Gir</h3>
+                <div class="code-inputs">
+                    <input type="number" class="code-input" id="code-1" min="1" max="6" maxlength="1">
+                    <input type="number" class="code-input" id="code-2" min="1" max="6" maxlength="1">
+                    <input type="number" class="code-input" id="code-3" min="1" max="6" maxlength="1">
+                    <input type="number" class="code-input" id="code-4" min="1" max="6" maxlength="1">
+                </div>
+                <div class="connection-buttons">
+                    <button class="btn btn-primary" id="connect-btn">Bağlan</button>
+                    <button class="btn btn-secondary" id="disconnect-btn">Bağlantıyı Kes</button>
+                </div>
+            </div>
+            
+            <div class="connection-section">
+                <h3 class="section-title">Rastgele Kod Oluştur</h3>
+                <div class="connection-buttons">
+                    <button class="btn btn-success" id="generate-code-btn">Kod Oluştur ve Bekle</button>
+                </div>
+            </div>
+            
+            <div class="connection-status status-disconnected" id="connection-status">
+                Bağlı değil - Arkadaşını bekliyorsun
+            </div>
+            
+            <div class="users-section">
+                <h3 class="section-title">Bağlı Kullanıcılar (<span id="user-count">0</span>/10)</h3>
+                <div class="users-list" id="users-list">
+                    <!-- Users will be added here -->
+                </div>
+            </div>
+            
+            <div class="instructions">
+                <h3>Nasıl Çalışır?</h3>
+                <ol>
+                    <li>Bir kod oluştur (örneğin: 1212)</li>
+                    <li>Bu kodu arkadaşına söyle</li>
+                    <li>Arkadaşın aynı kodu girince bağlanırsınız</li>
+                    <li>En fazla 10 kişi sohbet edebilir</li>
+                </ol>
+            </div>
+        </div>
+        
+        <!-- Chat Area -->
+        <div class="chat-area">
+            <!-- Waiting Screen -->
+            <div class="waiting-screen" id="waiting-screen">
+                <div class="waiting-icon">⏳</div>
+                <h2 class="waiting-title">Bağlantı Bekleniyor</h2>
+                <p class="waiting-subtitle">Aşağıdaki kodu arkadaşlarına ver ve bağlanmalarını bekle</p>
+                <div class="waiting-code" id="waiting-code">----</div>
+                <p>Bağlanan kişiler aşağıda görünecektir</p>
+                
+                <div class="connected-users">
+                    <h3 class="connected-users-title">Bağlı Kullanıcılar</h3>
+                    <div id="connected-users-list">
+                        <div class="user-item">
+                            <div class="user-avatar-small" id="waiting-user-avatar">S</div>
+                            <div class="user-name" id="waiting-user-name">Sen</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Chat Screen -->
+            <div class="chat-screen" id="chat-screen" style="display: none; height: 100%;">
+                <div class="chat-header">
+                    <div class="chat-title" id="chat-title">Genel Sohbet</div>
+                    <div class="chat-actions">
+                        <button class="action-btn voice-call" id="voice-call-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                            </svg>
+                            Sesli Görüşme
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="chat-messages" id="chat-messages">
+                    <!-- Messages will be added here -->
+                </div>
+                
+                <div class="chat-input-container">
+                    <input type="text" class="chat-input" id="message-input" placeholder="Bağlantı kurulduktan sonra mesaj yazabilirsiniz..." disabled>
+                    <button class="send-button" id="send-button" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Voice Call Modal -->
+    <div class="voice-modal" id="voice-modal">
+        <div class="voice-call-container">
+            <h2 class="call-title">Sesli Görüşme</h2>
+            <div class="call-participants" id="call-participants">
+                <!-- Participants will be added here -->
+            </div>
+            <div class="call-controls">
+                <button class="call-btn mute" id="mute-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                        <line x1="12" y1="19" x2="12" y2="23"></line>
+                        <line x1="8" y1="23" x2="16" y2="23"></line>
+                    </svg>
+                </button>
+                <button class="call-btn decline" id="end-call-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.33-2.67m-2.67-3.34a19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Socket.io -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Socket.io bağlantısı
+            const socket = io('http://localhost:5000');
+            
+            // DOM Elements
+            const loginContainer = document.getElementById('login-container');
+            const appContainer = document.getElementById('app-container');
+            const usernameInput = document.getElementById('username');
+            const loginBtn = document.getElementById('login-btn');
+            
+            const codeInputs = [
+                document.getElementById('code-1'),
+                document.getElementById('code-2'),
+                document.getElementById('code-3'),
+                document.getElementById('code-4')
+            ];
+            
+            const connectBtn = document.getElementById('connect-btn');
+            const disconnectBtn = document.getElementById('disconnect-btn');
+            const generateCodeBtn = document.getElementById('generate-code-btn');
+            const connectionStatus = document.getElementById('connection-status');
+            const chatMessages = document.getElementById('chat-messages');
+            const messageInput = document.getElementById('message-input');
+            const sendButton = document.getElementById('send-button');
+            const chatTitle = document.getElementById('chat-title');
+            const userAvatar = document.getElementById('user-avatar');
+            const userName = document.getElementById('user-name');
+            const userCount = document.getElementById('user-count');
+            const usersList = document.getElementById('users-list');
+            
+            const waitingScreen = document.getElementById('waiting-screen');
+            const chatScreen = document.getElementById('chat-screen');
+            const waitingCode = document.getElementById('waiting-code');
+            const waitingUserAvatar = document.getElementById('waiting-user-avatar');
+            const waitingUserName = document.getElementById('waiting-user-name');
+            const connectedUsersList = document.getElementById('connected-users-list');
+            
+            const voiceCallBtn = document.getElementById('voice-call-btn');
+            const voiceModal = document.getElementById('voice-modal');
+            const endCallBtn = document.getElementById('end-call-btn');
+            const muteBtn = document.getElementById('mute-btn');
+            const callParticipants = document.getElementById('call-participants');
+            
+            // State variables
+            let currentUser = '';
+            let isConnected = false;
+            let currentCode = '';
+            let connectionType = ''; // 'host' or 'client'
+            let connectedUsers = [];
+            let isInVoiceCall = false;
+            let isMuted = false;
+            
+            // Socket event listener'ları
+            socket.on('connect', function() {
+                console.log('Sunucuya bağlandı:', socket.id);
+                updateConnectionStatus('waiting', 'Sunucuya bağlandı');
+            });
+            
+            socket.on('disconnect', function() {
+                console.log('Sunucu bağlantısı kesildi');
+                updateConnectionStatus('disconnected', 'Sunucu bağlantısı kesildi');
+            });
+            
+            socket.on('user_joined', function(data) {
+                console.log('Yeni kullanıcı:', data.username);
+                updateUsersList(data.users);
+                addSystemMessage(data.username + ' sohbete katıldı');
+                updateUserCount(data.users.length);
+            });
+            
+            socket.on('user_left', function(data) {
+                console.log('Kullanıcı ayrıldı:', data.username);
+                updateUsersList(data.users);
+                addSystemMessage(data.username + ' sohbetten ayrıldı');
+                updateUserCount(data.users.length);
+            });
+            
+            socket.on('new_message', function(data) {
+                if (data.username !== currentUser.name) {
+                    addMessage(data.username, data.message, new Date(data.timestamp).toLocaleTimeString('tr-TR'), false);
+                }
+            });
+            
+            socket.on('message_history', function(data) {
+                // Mesaj geçmişini yükle
+                chatMessages.innerHTML = '';
+                data.messages.forEach(msg => {
+                    const isSent = msg.username === currentUser.name;
+                    addMessage(msg.username, msg.message, new Date(msg.timestamp).toLocaleTimeString('tr-TR'), isSent);
+                });
+            });
+            
+            socket.on('voice_call_started', function(data) {
+                addSystemMessage(data.started_by + ' sesli görüşme başlattı');
+                if (data.started_by !== currentUser.name) {
+                    voiceModal.classList.add('active');
+                }
+            });
+            
+            socket.on('voice_call_ended', function(data) {
+                addSystemMessage(data.ended_by + ' sesli görüşme sonlandırdı');
+                voiceModal.classList.remove('active');
+                isInVoiceCall = false;
+                voiceCallBtn.classList.remove('active');
+                voiceCallBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                    </svg>
+                    Sesli Görüşme
+                `;
+            });
+            
+            // WebRTC event'leri
+            socket.on('webrtc_offer', handleWebRTCOffer);
+            socket.on('webrtc_answer', handleWebRTCAnswer);
+            socket.on('ice_candidate', handleICECandidate);
+            
+            // Login
+            loginBtn.addEventListener('click', function() {
+                const username = usernameInput.value.trim();
+                
+                if (username === '') {
+                    alert('Lütfen bir kullanıcı adı girin');
+                    return;
+                }
+                
+                if (username.length > 15) {
+                    alert('Kullanıcı adı en fazla 15 karakter olabilir');
+                    return;
+                }
+                
+                currentUser = {
+                    name: username,
+                    avatar: username.charAt(0).toUpperCase()
+                };
+                
+                // Update UI
+                userAvatar.textContent = currentUser.avatar;
+                userName.textContent = currentUser.name;
+                waitingUserAvatar.textContent = currentUser.avatar;
+                waitingUserName.textContent = currentUser.name;
+                
+                // Show app
+                loginContainer.style.display = 'none';
+                appContainer.style.display = 'flex';
+            });
+            
+            // Code input handling
+            codeInputs.forEach((input, index) => {
+                input.addEventListener('input', function() {
+                    if (this.value.length === 1 && index < codeInputs.length - 1) {
+                        codeInputs[index + 1].focus();
+                    }
+                    
+                    // Validate input (1-6)
+                    if (this.value < 1) this.value = 1;
+                    if (this.value > 6) this.value = 6;
+                });
+                
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace' && this.value === '' && index > 0) {
+                        codeInputs[index - 1].focus();
+                    }
+                });
+            });
+            
+            // Generate random code
+            generateCodeBtn.addEventListener('click', async function() {
+                if (!currentUser) {
+                    alert('Lütfen önce giriş yapın');
+                    return;
+                }
+                
+                try {
+                    const response = await createRoom(currentUser.name);
+                    
+                    if (response.success) {
+                        currentCode = response.code;
+                        connectionType = 'host';
+                        
+                        // Fill the inputs with the generated code
+                        codeInputs.forEach((input, index) => {
+                            input.value = currentCode[index];
+                        });
+                        
+                        updateConnectionStatus('waiting', 'Kod oluşturuldu - Arkadaşlarını bekliyorsun...');
+                        chatTitle.textContent = 'Oda: ' + currentCode;
+                        
+                        // Show waiting screen
+                        waitingScreen.style.display = 'flex';
+                        chatScreen.style.display = 'none';
+                        waitingCode.textContent = currentCode;
+                        
+                        // Add host to connected users
+                        connectedUsers = [currentUser];
+                        updateUsersList();
+                        
+                        // Socket ile odaya katıl
+                        socket.emit('join_room', { code: currentCode, username: currentUser.name });
+                    } else {
+                        alert(response.message);
+                    }
+                } catch (error) {
+                    console.error('Oda oluşturma hatası:', error);
+                    alert('Oda oluşturulurken hata oluştu');
+                }
+            });
+            
+            // Connect with code
+            connectBtn.addEventListener('click', async function() {
+                if (!currentUser) {
+                    alert('Lütfen önce giriş yapın');
+                    return;
+                }
+                
+                const code = codeInputs.map(input => input.value).join('');
+                
+                if (code.length !== 4) {
+                    alert('Lütfen 4 haneli bir kod girin (1-6 arası rakamlar)');
+                    return;
+                }
+                
+                try {
+                    const response = await joinRoom(code, currentUser.name);
+                    
+                    if (response.success) {
+                        currentCode = code;
+                        connectionType = 'client';
+                        establishConnection();
+                        
+                        // Socket ile odaya katıl
+                        socket.emit('join_room', { code: currentCode, username: currentUser.name });
+                    } else {
+                        alert(response.message);
+                    }
+                } catch (error) {
+                    console.error('Odaya katılma hatası:', error);
+                    alert('Odaya katılırken hata oluştu');
+                }
+            });
+            
+            // Disconnect
+            disconnectBtn.addEventListener('click', function() {
+                if (currentCode && currentUser) {
+                    socket.emit('leave_room', { code: currentCode, username: currentUser.name });
+                    resetConnection();
+                }
+            });
+            
+            // Send message
+            sendButton.addEventListener('click', sendMessage);
+            
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            function sendMessage() {
+                const messageText = messageInput.value.trim();
+                if (messageText === '' || !isConnected) return;
+                
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('tr-TR');
+                
+                // Mesajı kendi ekranına ekle
+                addMessage(currentUser.name, messageText, timeString, true);
+                
+                // Sunucuya gönder
+                socket.emit('send_message', { 
+                    code: currentCode, 
+                    username: currentUser.name, 
+                    message: messageText 
+                });
+                
+                messageInput.value = '';
+            }
+            
+            function addMessage(sender, text, time, isSent) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+                
+                const messageBubble = document.createElement('div');
+                messageBubble.className = 'message-bubble';
+                
+                if (!isSent) {
+                    const senderDiv = document.createElement('div');
+                    senderDiv.className = 'message-sender';
+                    senderDiv.textContent = sender;
+                    messageBubble.appendChild(senderDiv);
+                }
+                
+                const textDiv = document.createElement('div');
+                textDiv.className = 'message-text';
+                textDiv.textContent = text;
+                messageBubble.appendChild(textDiv);
+                
+                const timeDiv = document.createElement('div');
+                timeDiv.className = 'message-time';
+                timeDiv.textContent = time;
+                messageBubble.appendChild(timeDiv);
+                
+                messageDiv.appendChild(messageBubble);
+                chatMessages.appendChild(messageDiv);
+                
+                // Scroll to the latest message
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            function addSystemMessage(text) {
+                const systemDiv = document.createElement('div');
+                systemDiv.className = 'system-message';
+                systemDiv.textContent = text;
+                chatMessages.appendChild(systemDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            function updateConnectionStatus(status, message) {
+                connectionStatus.className = 'connection-status';
+                
+                if (status === 'connected') {
+                    connectionStatus.classList.add('status-connected');
+                } else if (status === 'waiting') {
+                    connectionStatus.classList.add('status-waiting');
+                } else {
+                    connectionStatus.classList.add('status-disconnected');
+                }
+                
+                connectionStatus.textContent = message;
+            }
+            
+            function establishConnection() {
+                isConnected = true;
+                
+                // Update UI
+                updateConnectionStatus('connected', 'Bağlantı kuruldu - ' + connectedUsers.length + ' kullanıcı bağlı');
+                chatTitle.textContent = 'Oda: ' + currentCode + ' (' + connectedUsers.length + '/10)';
+                
+                // Show chat screen
+                waitingScreen.style.display = 'none';
+                chatScreen.style.display = 'flex';
+                
+                // Enable message input
+                messageInput.disabled = false;
+                messageInput.placeholder = 'Mesajınızı yazın...';
+                sendButton.disabled = false;
+                
+                // Clear chat messages
+                chatMessages.innerHTML = '';
+                
+                // Add connection message
+                addSystemMessage('Bağlantı kuruldu - Artık sohbet edebilirsiniz');
+            }
+            
+            function updateUsersList(users = null) {
+                if (users) {
+                    connectedUsers = users;
+                }
+                
+                // Update user count
+                userCount.textContent = connectedUsers.length;
+                
+                // Update users list in connection panel
+                usersList.innerHTML = '';
+                connectedUsers.forEach(user => {
+                    const userItem = document.createElement('div');
+                    userItem.className = 'user-item';
+                    userItem.innerHTML = `
+                        <div class="user-avatar-small">${user.avatar}</div>
+                        <div class="user-name">${user.username || user.name}</div>
+                    `;
+                    usersList.appendChild(userItem);
+                });
+                
+                // Update connected users in waiting screen
+                connectedUsersList.innerHTML = '';
+                connectedUsers.forEach(user => {
+                    const userItem = document.createElement('div');
+                    userItem.className = 'user-item';
+                    userItem.innerHTML = `
+                        <div class="user-avatar-small">${user.avatar}</div>
+                        <div class="user-name">${user.username || user.name}</div>
+                    `;
+                    connectedUsersList.appendChild(userItem);
+                });
+                
+                // Update call participants
+                updateCallParticipants();
+            }
+            
+            function updateUserCount(count) {
+                userCount.textContent = count;
+                chatTitle.textContent = 'Oda: ' + currentCode + ' (' + count + '/10)';
+            }
+            
+            function updateCallParticipants() {
+                callParticipants.innerHTML = '';
+                connectedUsers.forEach(user => {
+                    const participant = document.createElement('div');
+                    participant.className = 'participant';
+                    participant.innerHTML = `
+                        <div class="participant-avatar">${user.avatar}</div>
+                        <div class="participant-name">${user.username || user.name}</div>
+                        <div class="participant-status">${(user.username || user.name) === currentUser.name ? 'Sen' : 'Bağlı'}</div>
+                    `;
+                    callParticipants.appendChild(participant);
+                });
+            }
+            
+            function resetConnection() {
+                isConnected = false;
+                currentCode = '';
+                connectionType = '';
+                connectedUsers = [];
+                
+                // Update UI
+                updateConnectionStatus('disconnected', 'Bağlı değil - Arkadaşını bekliyorsun');
+                chatTitle.textContent = 'Bağlantı Bekleniyor';
+                
+                // Show waiting screen
+                waitingScreen.style.display = 'flex';
+                chatScreen.style.display = 'none';
+                
+                // Disable message input
+                messageInput.disabled = true;
+                messageInput.placeholder = 'Bağlantı kurulduktan sonra mesaj yazabilirsiniz...';
+                sendButton.disabled = true;
+                
+                // Clear code inputs
+                codeInputs.forEach(input => {
+                    input.value = '';
+                });
+                
+                // Clear chat messages
+                chatMessages.innerHTML = '';
+                
+                // Reset users list
+                updateUsersList();
+            }
+            
+            // API fonksiyonları
+            async function createRoom(username) {
+                const response = await fetch('http://localhost:5000/api/create_room', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username: username })
+                });
+                return await response.json();
+            }
+            
+            async function joinRoom(code, username) {
+                const response = await fetch('http://localhost:5000/api/join_room', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ code: code, username: username })
+                });
+                return await response.json();
+            }
+            
+            // Voice call functionality
+            voiceCallBtn.addEventListener('click', function() {
+                if (!isInVoiceCall) {
+                    socket.emit('start_voice_call', { code: currentCode, username: currentUser.name });
+                    voiceModal.classList.add('active');
+                    voiceCallBtn.classList.add('active');
+                    voiceCallBtn.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.33-2.67m-2.67-3.34a19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"></path>
+                        </svg>
+                        Görüşmeyi Sonlandır
+                    `;
+                    isInVoiceCall = true;
+                } else {
+                    socket.emit('end_voice_call', { code: currentCode, username: currentUser.name });
+                    endVoiceCall();
+                }
+            });
+            
+            function endVoiceCall() {
+                voiceModal.classList.remove('active');
+                voiceCallBtn.classList.remove('active');
+                voiceCallBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                    </svg>
+                    Sesli Görüşme
+                `;
+                isInVoiceCall = false;
+            }
+            
+            // End call button
+            endCallBtn.addEventListener('click', function() {
+                socket.emit('end_voice_call', { code: currentCode, username: currentUser.name });
+                endVoiceCall();
+            });
+            
+            // Mute button
+            muteBtn.addEventListener('click', function() {
+                isMuted = !isMuted;
+                if (isMuted) {
+                    muteBtn.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="1" y1="1" x2="23" y2="23"></line>
+                            <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path>
+                            <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path>
+                            <line x1="12" y1="19" x2="12" y2="23"></line>
+                            <line x1="8" y1="23" x2="16" y2="23"></line>
+                        </svg>
+                    `;
+                    muteBtn.style.background = '#e74c3c';
+                } else {
+                    muteBtn.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                            <line x1="12" y1="19" x2="12" y2="23"></line>
+                            <line x1="8" y1="23" x2="16" y2="23"></line>
+                        </svg>
+                    `;
+                    muteBtn.style.background = '#f39c12';
+                }
+            });
+            
+            // WebRTC fonksiyonları (basit implementasyon)
+            function handleWebRTCOffer(data) {
+                console.log('WebRTC offer received:', data);
+            }
+            
+            function handleWebRTCAnswer(data) {
+                console.log('WebRTC answer received:', data);
+            }
+            
+            function handleICECandidate(data) {
+                console.log('ICE candidate received:', data);
+            }
+        });
+    </script>
+</body>
+</html>
